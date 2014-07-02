@@ -169,27 +169,70 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Generate OSGi metadata for desktop native libs. Has no impact on non OSGi users. -->
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>bundle-manifest-desktop</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>manifest</goal>
+                        </goals>
+                        <configuration>
+                            <manifestLocation>${basedir}/target/desktop/META-INF</manifestLocation>
+                            <instructions>
+                                <Fragment-Host>com.badlogicgames.gdx.freetype</Fragment-Host>
+                                <Bundle-NativeCode>
+                                    libgdx-freetype.so; osname=linux; processor=x86,
+                                    libgdx-freetype64.so; osname=linux; processor=x86-64,
+                                    gdx-freetype.dll; osname=win32; processor=x86,
+                                    gdx-freetype64.dll; osname=win64; processor=x86-64,
+                                    libgdx-freetype.dylib; osname=macosx; processor=x86,
+                                    libgdx-freetype64.dylib; osname=macosx; processor=x86-64
+                                </Bundle-NativeCode>
+                            </instructions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             
             <!-- finally package everything up into jar files -->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.4</version>
-                <configuration>
-                    <descriptors>
-                        <descriptor>desktop.xml</descriptor>
-                        <descriptor>x86.xml</descriptor>                        
-                        <descriptor>armeabi.xml</descriptor>
-                        <descriptor>armeabi-v7a.xml</descriptor>
-                        <descriptor>ios.xml</descriptor>
-                    </descriptors>
-                </configuration>
                 <executions>
                     <execution>
-                        <id>make-assembly</id>
+                        <id>make-assembly-desktop</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>desktop.xml</descriptor>
+                            </descriptors>
+                            <archive>
+                                <manifestFile>${basedir}/target/desktop/META-INF/MANIFEST.MF</manifestFile>
+                            </archive>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>make-assembly-others</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>x86.xml</descriptor>
+                                <descriptor>armeabi.xml</descriptor>
+                                <descriptor>armeabi-v7a.xml</descriptor>
+                                <descriptor>ios.xml</descriptor>
+                            </descriptors>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

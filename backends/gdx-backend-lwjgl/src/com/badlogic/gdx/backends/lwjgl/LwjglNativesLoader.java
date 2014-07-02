@@ -38,7 +38,15 @@ public final class LwjglNativesLoader {
 			method.invoke(null, "javax.jnlp.PersistenceService");
 			load = false;
 		} catch (Throwable ex) {
-			load = true;
+		}
+		// Don't extract natives if running inside OSGi.
+		try {
+			Method method = Class.forName("org.osgi.framework.FrameworkUtil").getDeclaredMethod("getBundle", new Class[] {Class.class});
+			if (method.invoke(null, LwjglNativesLoader.class) != null) {
+				load = false;
+			}
+		} catch (Throwable ex) {
+			ex.printStackTrace();
 		}
 	}
 
