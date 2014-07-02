@@ -46,7 +46,6 @@ public final class LwjglNativesLoader {
 				load = false;
 			}
 		} catch (Throwable ex) {
-			ex.printStackTrace();
 		}
 	}
 
