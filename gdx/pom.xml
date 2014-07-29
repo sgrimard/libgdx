@@ -37,6 +37,24 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+            <configuration>
+              <instructions>
+                <DynamicImport-Package>*</DynamicImport-Package>
+              </instructions>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
 	
 	<resources>
