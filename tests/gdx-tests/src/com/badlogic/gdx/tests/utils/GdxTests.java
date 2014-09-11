@@ -32,6 +32,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
 import com.badlogic.gdx.tests.*;
 import com.badlogic.gdx.tests.bench.TiledMapBench;
 import com.badlogic.gdx.tests.examples.MoveSpriteExample;
+import com.badlogic.gdx.tests.extensions.ControllersTest;
 import com.badlogic.gdx.tests.g3d.Animation3DTest;
 import com.badlogic.gdx.tests.g3d.Basic3DSceneTest;
 import com.badlogic.gdx.tests.g3d.Basic3DTest;
@@ -73,6 +74,7 @@ public class GdxTests {
 		AlphaTest.class,
 		Animation3DTest.class,
 		AnimationTest.class,
+		AnnotationTest.class,
 		AssetManagerTest.class,
 		AtlasIssueTest.class,
 		AudioDeviceTest.class,
@@ -85,6 +87,7 @@ public class GdxTests {
 		BitmapFontFlipTest.class,
 		BitmapFontMetricsTest.class,
 		BitmapFontTest.class,
+		BitmapFontAtlasRegionTest.class,
 		BlitTest.class,
 		Box2DTest.class,
 		Box2DTestCollection.class,
@@ -109,7 +112,7 @@ public class GdxTests {
 		FrameBufferTest.class,
 		FramebufferToTextureTest.class,
 		FullscreenTest.class,
-		GamepadTest.class,
+		ControllersTest.class,
 		Gdx2DTest.class,
 		GestureDetectorTest.class,
 		GroupCullingTest.class,
