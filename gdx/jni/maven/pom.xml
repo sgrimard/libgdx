@@ -211,6 +211,32 @@
                 </executions>
             </plugin>
             
+            <!-- Generate OSGi metadata for android libs. Used to generate an android specific osgi jar. -->
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>bundle-manifest-android</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>manifest</goal>
+                        </goals>
+                        <configuration>
+                            <manifestLocation>${basedir}/target/android-osgi/META-INF</manifestLocation>
+                            <instructions>
+                                <Fragment-Host>com.badlogicgames.gdx</Fragment-Host>
+                                <Bundle-NativeCode>
+                                    armeabi/libgdx.so; osname=linux; processor=arm,
+                                    armeabi-v7a/libgdx.so; osname=linux; processor=armv7l,
+                                    x86/libgdx.so; osname=linux; processor=x86
+                                </Bundle-NativeCode>
+                            </instructions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
             <!-- finally package everything up into jar files -->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -228,6 +254,21 @@
                             </descriptors>
                             <archive>
                                 <manifestFile>${basedir}/target/desktop/META-INF/MANIFEST.MF</manifestFile>
+                            </archive>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>make-assembly-android-osgi</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>android-osgi.xml</descriptor>
+                            </descriptors>
+                            <archive>
+                                <manifestFile>${basedir}/target/android-osgi/META-INF/MANIFEST.MF</manifestFile>
                             </archive>
                         </configuration>
                     </execution>
