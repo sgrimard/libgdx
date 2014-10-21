@@ -14,9 +14,17 @@
  * limitations under the License.
  ******************************************************************************/
 
-package com.badlogic.gdx.tests.ai.fsm;
+package com.badlogic.gdx.physics.box2d;
 
-/** @author davebaol */
-public enum Location {
-	SHACK, GOLD_MINE, BANK, SALOON;
+/** A stub that does nothing at all, since there is no initialization necessary in case of GWT.
+ * @author Daniel Holderbaum */
+public final class Box2D {
+
+	private Box2D () {
+	}
+
+	/** Does nothing on GWT. */
+	public static void init () {
+	}
+
 }

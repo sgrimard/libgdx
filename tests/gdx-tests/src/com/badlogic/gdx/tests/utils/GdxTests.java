@@ -46,6 +46,7 @@ import com.badlogic.gdx.tests.g3d.ShaderCollectionTest;
 import com.badlogic.gdx.tests.g3d.ShaderTest;
 import com.badlogic.gdx.tests.g3d.ShadowMappingTest;
 import com.badlogic.gdx.tests.g3d.SkeletonTest;
+import com.badlogic.gdx.tests.g3d.TextureRegion3DTest;
 import com.badlogic.gdx.tests.gles2.HelloTriangle;
 import com.badlogic.gdx.tests.gles2.SimpleVertexShader;
 import com.badlogic.gdx.tests.net.NetAPITest;
@@ -71,6 +72,7 @@ public class GdxTests {
 		AccelerometerTest.class,
 		ActionSequenceTest.class,
 		ActionTest.class,
+		Affine2Test.class,
 		AlphaTest.class,
 		Animation3DTest.class,
 		AnimationTest.class,
@@ -94,6 +96,7 @@ public class GdxTests {
 		Bresenham2Test.class,
 		BufferUtilsTest.class,
 		BulletTestCollection.class,
+		CpuSpriteBatchTest.class,
 		ContainerTest.class,
 		CullTest.class,
 		DelaunayTriangulatorTest.class,
@@ -189,7 +192,6 @@ public class GdxTests {
 		SpriteCacheTest.class,
 		StagePerformanceTest.class,
 		StageTest.class,
-		StateMachineTest.class,
 		SuperKoalio.class,
 		TableLayoutTest.class,
 		TableTest.class,
@@ -200,6 +202,7 @@ public class GdxTests {
 		TextureDataTest.class,
 		TextureDownloadTest.class,
 		TextureFormatTest.class,
+		TextureRegion3DTest.class,
 		TideMapAssetManagerTest.class,
 		TideMapDirectLoaderTest.class,
 		TileTest.class,

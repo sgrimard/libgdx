@@ -39,6 +39,7 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -93,11 +94,20 @@ public class DefaultShader extends BaseShader {
 		public final static Uniform opacity = new Uniform("u_opacity", BlendingAttribute.Type);
 		public final static Uniform diffuseColor = new Uniform("u_diffuseColor", ColorAttribute.Diffuse);
 		public final static Uniform diffuseTexture = new Uniform("u_diffuseTexture", TextureAttribute.Diffuse);
+		public final static Uniform diffuseUVTransform = new Uniform("u_diffuseUVTransform", TextureAttribute.Diffuse);
 		public final static Uniform specularColor = new Uniform("u_specularColor", ColorAttribute.Specular);
 		public final static Uniform specularTexture = new Uniform("u_specularTexture", TextureAttribute.Specular);
+		public final static Uniform specularUVTransform = new Uniform("u_specularUVTransform", TextureAttribute.Specular);
 		public final static Uniform emissiveColor = new Uniform("u_emissiveColor", ColorAttribute.Emissive);
+		public final static Uniform emissiveTexture = new Uniform("u_emissiveTexture", TextureAttribute.Emissive);
+		public final static Uniform emissiveUVTransform = new Uniform("u_emissiveUVTransform", TextureAttribute.Emissive);
 		public final static Uniform reflectionColor = new Uniform("u_reflectionColor", ColorAttribute.Reflection);
+		public final static Uniform reflectionTexture = new Uniform("u_reflectionTexture", TextureAttribute.Reflection);
+		public final static Uniform reflectionUVTransform = new Uniform("u_reflectionUVTransform", TextureAttribute.Reflection);
 		public final static Uniform normalTexture = new Uniform("u_normalTexture", TextureAttribute.Normal);
+		public final static Uniform normalUVTransform = new Uniform("u_normalUVTransform", TextureAttribute.Normal);
+		public final static Uniform ambientTexture = new Uniform("u_ambientTexture", TextureAttribute.Ambient);
+		public final static Uniform ambientUVTransform = new Uniform("u_ambientUVTransform", TextureAttribute.Ambient);
 		public final static Uniform alphaTest = new Uniform("u_alphaTest");
 
 		public final static Uniform ambientCube = new Uniform("u_ambientCubemap");
@@ -107,135 +117,77 @@ public class DefaultShader extends BaseShader {
 	}
 
 	public static class Setters {
-		public final static Setter projTrans = new Setter() {
-			@Override
-			public boolean isGlobal (BaseShader shader, int inputID) {
-				return true;
-			}
-
+		public final static Setter projTrans = new GlobalSetter() {
 			@Override
 			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
 				shader.set(inputID, shader.camera.projection);
 			}
 		};
-		public final static Setter viewTrans = new Setter() {
-			@Override
-			public boolean isGlobal (BaseShader shader, int inputID) {
-				return true;
-			}
-
+		public final static Setter viewTrans = new GlobalSetter() {
 			@Override
 			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
 				shader.set(inputID, shader.camera.view);
 			}
 		};
-		public final static Setter projViewTrans = new Setter() {
-			@Override
-			public boolean isGlobal (BaseShader shader, int inputID) {
-				return true;
-			}
-
+		public final static Setter projViewTrans = new GlobalSetter() {
 			@Override
 			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
 				shader.set(inputID, shader.camera.combined);
 			}
 		};
-		public final static Setter cameraPosition = new Setter() {
-			@Override
-			public boolean isGlobal (BaseShader shader, int inputID) {
-				return true;
-			}
-
+		public final static Setter cameraPosition = new GlobalSetter() {
 			@Override
 			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
 				shader.set(inputID, shader.camera.position.x, shader.camera.position.y, shader.camera.position.z,
 					1.1881f / (shader.camera.far * shader.camera.far));
 			}
 		};
-		public final static Setter cameraDirection = new Setter() {
-			@Override
-			public boolean isGlobal (BaseShader shader, int inputID) {
-				return true;
-			}
-
+		public final static Setter cameraDirection = new GlobalSetter() {
 			@Override
 			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
 				shader.set(inputID, shader.camera.direction);
 			}
 		};
-		public final static Setter cameraUp = new Setter() {
-			@Override
-			public boolean isGlobal (BaseShader shader, int inputID) {
-				return true;
-			}
-
+		public final static Setter cameraUp = new GlobalSetter() {
 			@Override
 			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
 				shader.set(inputID, shader.camera.up);
 			}
 		};
-		public final static Setter worldTrans = new Setter() {
-			@Override
-			public boolean isGlobal (BaseShader shader, int inputID) {
-				return false;
-			}
-
+		public final static Setter worldTrans = new LocalSetter() {
 			@Override
 			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
 				shader.set(inputID, renderable.worldTransform);
 			}
 		};
-		public final static Setter viewWorldTrans = new Setter() {
+		public final static Setter viewWorldTrans = new LocalSetter() {
 			final Matrix4 temp = new Matrix4();
-
-			@Override
-			public boolean isGlobal (BaseShader shader, int inputID) {
-				return false;
-			}
-
 			@Override
 			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
 				shader.set(inputID, temp.set(shader.camera.view).mul(renderable.worldTransform));
 			}
 		};
-		public final static Setter projViewWorldTrans = new Setter() {
+		public final static Setter projViewWorldTrans = new LocalSetter() {
 			final Matrix4 temp = new Matrix4();
-
-			@Override
-			public boolean isGlobal (BaseShader shader, int inputID) {
-				return false;
-			}
-
 			@Override
 			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
 				shader.set(inputID, temp.set(shader.camera.combined).mul(renderable.worldTransform));
 			}
 		};
-		public final static Setter normalMatrix = new Setter() {
+		public final static Setter normalMatrix = new LocalSetter() {
 			private final Matrix3 tmpM = new Matrix3();
-
-			@Override
-			public boolean isGlobal (BaseShader shader, int inputID) {
-				return false;
-			}
-
 			@Override
 			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
 				shader.set(inputID, tmpM.set(renderable.worldTransform).inv().transpose());
 			}
 		};
 
-		public static class Bones implements Setter {
+		public static class Bones extends LocalSetter {
 			private final static Matrix4 idtMatrix = new Matrix4();
 			public final float bones[];
 
 			public Bones (final int numBones) {
 				this.bones = new float[numBones * 16];
-			}
-
-			@Override
-			public boolean isGlobal (BaseShader shader, int inputID) {
-				return false;
 			}
 
 			@Override
@@ -249,34 +201,19 @@ public class DefaultShader extends BaseShader {
 			}
 		}
 
-		public final static Setter shininess = new Setter() {
-			@Override
-			public boolean isGlobal (BaseShader shader, int inputID) {
-				return false;
-			}
-
+		public final static Setter shininess = new LocalSetter() {
 			@Override
 			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
 				shader.set(inputID, ((FloatAttribute)(combinedAttributes.get(FloatAttribute.Shininess))).value);
 			}
 		};
-		public final static Setter diffuseColor = new Setter() {
-			@Override
-			public boolean isGlobal (BaseShader shader, int inputID) {
-				return false;
-			}
-
+		public final static Setter diffuseColor = new LocalSetter() {
 			@Override
 			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
 				shader.set(inputID, ((ColorAttribute)(combinedAttributes.get(ColorAttribute.Diffuse))).color);
 			}
 		};
-		public final static Setter diffuseTexture = new Setter() {
-			@Override
-			public boolean isGlobal (BaseShader shader, int inputID) {
-				return false;
-			}
-
+		public final static Setter diffuseTexture = new LocalSetter() {
 			@Override
 			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
 				final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
@@ -284,23 +221,20 @@ public class DefaultShader extends BaseShader {
 				shader.set(inputID, unit);
 			}
 		};
-		public final static Setter specularColor = new Setter() {
+		public final static Setter diffuseUVTransform = new LocalSetter() {
 			@Override
-			public boolean isGlobal (BaseShader shader, int inputID) {
-				return false;
+			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
+				final TextureAttribute ta = (TextureAttribute)(combinedAttributes.get(TextureAttribute.Diffuse));
+				shader.set(inputID, ta.offsetU, ta.offsetV, ta.scaleU, ta.scaleV);
 			}
-
+		};
+		public final static Setter specularColor = new LocalSetter() {
 			@Override
 			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
 				shader.set(inputID, ((ColorAttribute)(combinedAttributes.get(ColorAttribute.Specular))).color);
 			}
 		};
-		public final static Setter specularTexture = new Setter() {
-			@Override
-			public boolean isGlobal (BaseShader shader, int inputID) {
-				return false;
-			}
-
+		public final static Setter specularTexture = new LocalSetter() {
 			@Override
 			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
 				final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
@@ -308,34 +242,56 @@ public class DefaultShader extends BaseShader {
 				shader.set(inputID, unit);
 			}
 		};
-		public final static Setter emissiveColor = new Setter() {
+		public final static Setter specularUVTransform = new LocalSetter() {
 			@Override
-			public boolean isGlobal (BaseShader shader, int inputID) {
-				return false;
+			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
+				final TextureAttribute ta = (TextureAttribute)(combinedAttributes.get(TextureAttribute.Specular));
+				shader.set(inputID, ta.offsetU, ta.offsetV, ta.scaleU, ta.scaleV);
 			}
-
+		};
+		public final static Setter emissiveColor = new LocalSetter() {
 			@Override
 			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
 				shader.set(inputID, ((ColorAttribute)(combinedAttributes.get(ColorAttribute.Emissive))).color);
 			}
 		};
-		public final static Setter reflectionColor = new Setter() {
+		public final static Setter emissiveTexture = new LocalSetter() {
 			@Override
-			public boolean isGlobal (BaseShader shader, int inputID) {
-				return false;
+			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
+				final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
+					.get(TextureAttribute.Emissive))).textureDescription);
+				shader.set(inputID, unit);
 			}
-
+		};
+		public final static Setter emissiveUVTransform = new LocalSetter() {
+			@Override
+			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
+				final TextureAttribute ta = (TextureAttribute)(combinedAttributes.get(TextureAttribute.Emissive));
+				shader.set(inputID, ta.offsetU, ta.offsetV, ta.scaleU, ta.scaleV);
+			}
+		};
+		public final static Setter reflectionColor = new LocalSetter() {
 			@Override
 			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
 				shader.set(inputID, ((ColorAttribute)(combinedAttributes.get(ColorAttribute.Reflection))).color);
 			}
 		};
-		public final static Setter normalTexture = new Setter() {
+		public final static Setter reflectionTexture = new LocalSetter() {
 			@Override
-			public boolean isGlobal (BaseShader shader, int inputID) {
-				return false;
+			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
+				final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
+					.get(TextureAttribute.Reflection))).textureDescription);
+				shader.set(inputID, unit);
 			}
-
+		};
+		public final static Setter reflectionUVTransform = new LocalSetter() {
+			@Override
+			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
+				final TextureAttribute ta = (TextureAttribute)(combinedAttributes.get(TextureAttribute.Reflection));
+				shader.set(inputID, ta.offsetU, ta.offsetV, ta.scaleU, ta.scaleV);
+			}
+		};
+		public final static Setter normalTexture = new LocalSetter() {
 			@Override
 			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
 				final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
@@ -343,8 +299,30 @@ public class DefaultShader extends BaseShader {
 				shader.set(inputID, unit);
 			}
 		};
+		public final static Setter normalUVTransform = new LocalSetter() {
+			@Override
+			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
+				final TextureAttribute ta = (TextureAttribute)(combinedAttributes.get(TextureAttribute.Normal));
+				shader.set(inputID, ta.offsetU, ta.offsetV, ta.scaleU, ta.scaleV);
+			}
+		};
+		public final static Setter ambientTexture = new LocalSetter() {
+			@Override
+			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
+				final int unit = shader.context.textureBinder.bind(((TextureAttribute)(combinedAttributes
+					.get(TextureAttribute.Ambient))).textureDescription);
+				shader.set(inputID, unit);
+			}
+		};
+		public final static Setter ambientUVTransform = new LocalSetter() {
+			@Override
+			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
+				final TextureAttribute ta = (TextureAttribute)(combinedAttributes.get(TextureAttribute.Ambient));
+				shader.set(inputID, ta.offsetU, ta.offsetV, ta.scaleU, ta.scaleV);
+			}
+		};
 
-		public static class ACubemap implements Setter {
+		public static class ACubemap extends LocalSetter {
 			private final static float ones[] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 			private final AmbientCubemap cacheAmbientCubemap = new AmbientCubemap();
 			private final static Vector3 tmpV1 = new Vector3();
@@ -354,11 +332,6 @@ public class DefaultShader extends BaseShader {
 			public ACubemap (final int dirLightsOffset, final int pointLightsOffset) {
 				this.dirLightsOffset = dirLightsOffset;
 				this.pointLightsOffset = pointLightsOffset;
-			}
-
-			@Override
-			public boolean isGlobal (BaseShader shader, int inputID) {
-				return false;
 			}
 
 			@Override
@@ -386,12 +359,7 @@ public class DefaultShader extends BaseShader {
 			}
 		}
 
-		public final static Setter environmentCubemap = new Setter() {
-			@Override
-			public boolean isGlobal (BaseShader shader, int inputID) {
-				return false;
-			}
-
+		public final static Setter environmentCubemap = new LocalSetter() {
 			@Override
 			public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
 				if (combinedAttributes.has(CubemapAttribute.EnvironmentMap)) {
@@ -445,11 +413,20 @@ public class DefaultShader extends BaseShader {
 	public final int u_opacity;
 	public final int u_diffuseColor;
 	public final int u_diffuseTexture;
+	public final int u_diffuseUVTransform;
 	public final int u_specularColor;
 	public final int u_specularTexture;
+	public final int u_specularUVTransform;
 	public final int u_emissiveColor;
+	public final int u_emissiveTexture;
+	public final int u_emissiveUVTransform;
 	public final int u_reflectionColor;
+	public final int u_reflectionTexture;
+	public final int u_reflectionUVTransform;
 	public final int u_normalTexture;
+	public final int u_normalUVTransform;
+	public final int u_ambientTexture;
+	public final int u_ambientUVTransform;
 	public final int u_alphaTest;
 	// Lighting uniforms
 	protected final int u_ambientCubemap;
@@ -474,6 +451,7 @@ public class DefaultShader extends BaseShader {
 	protected int pointLightsLoc;
 	protected int pointLightsColorOffset;
 	protected int pointLightsPositionOffset;
+	protected int pointLightsIntensityOffset;
 	protected int pointLightsSize;
 
 	protected final boolean lighting;
@@ -553,11 +531,20 @@ public class DefaultShader extends BaseShader {
 		u_opacity = register(Inputs.opacity);
 		u_diffuseColor = register(Inputs.diffuseColor, Setters.diffuseColor);
 		u_diffuseTexture = register(Inputs.diffuseTexture, Setters.diffuseTexture);
+		u_diffuseUVTransform = register(Inputs.diffuseUVTransform, Setters.diffuseUVTransform);
 		u_specularColor = register(Inputs.specularColor, Setters.specularColor);
 		u_specularTexture = register(Inputs.specularTexture, Setters.specularTexture);
+		u_specularUVTransform = register(Inputs.specularUVTransform, Setters.specularUVTransform);
 		u_emissiveColor = register(Inputs.emissiveColor, Setters.emissiveColor);
+		u_emissiveTexture = register(Inputs.emissiveTexture, Setters.emissiveTexture);
+		u_emissiveUVTransform = register(Inputs.emissiveUVTransform, Setters.emissiveUVTransform);
 		u_reflectionColor = register(Inputs.reflectionColor, Setters.reflectionColor);
+		u_reflectionTexture = register(Inputs.reflectionTexture, Setters.reflectionTexture);
+		u_reflectionUVTransform = register(Inputs.reflectionUVTransform, Setters.reflectionUVTransform);
 		u_normalTexture = register(Inputs.normalTexture, Setters.normalTexture);
+		u_normalUVTransform = register(Inputs.normalUVTransform, Setters.normalUVTransform);
+		u_ambientTexture = register(Inputs.ambientTexture, Setters.ambientTexture);
+		u_ambientUVTransform = register(Inputs.ambientUVTransform, Setters.ambientUVTransform);
 		u_alphaTest = register(Inputs.alphaTest);
 
 		u_ambientCubemap = lighting ? register(Inputs.ambientCube, new Setters.ACubemap(config.numDirectionalLights,
@@ -581,6 +568,7 @@ public class DefaultShader extends BaseShader {
 		pointLightsLoc = loc(u_pointLights0color);
 		pointLightsColorOffset = loc(u_pointLights0color) - pointLightsLoc;
 		pointLightsPositionOffset = loc(u_pointLights0position) - pointLightsLoc;
+		pointLightsIntensityOffset = has(u_pointLights0intensity) ? loc(u_pointLights0intensity) - pointLightsLoc : -1;
 		pointLightsSize = loc(u_pointLights1color) - pointLightsLoc;
 		if (pointLightsSize < 0) pointLightsSize = 0;
 	}
@@ -623,8 +611,6 @@ public class DefaultShader extends BaseShader {
 				prefix += "#define boneWeight" + attr.unit + "Flag\n";
 			else if (attr.usage == Usage.TextureCoordinates) prefix += "#define texCoord" + attr.unit + "Flag\n";
 		}
-		if ((attributes & Usage.Tangent) == Usage.Tangent) prefix += "#define tangentFlag\n";
-		if ((attributes & Usage.BiNormal) == Usage.BiNormal) prefix += "#define binormalFlag\n";
 		if ((mask & BlendingAttribute.Type) == BlendingAttribute.Type) prefix += "#define " + BlendingAttribute.Alias + "Flag\n";
 		if ((mask & TextureAttribute.Diffuse) == TextureAttribute.Diffuse) {
 			prefix += "#define " + TextureAttribute.DiffuseAlias + "Flag\n";
@@ -637,6 +623,18 @@ public class DefaultShader extends BaseShader {
 		if ((mask & TextureAttribute.Normal) == TextureAttribute.Normal) {
 			prefix += "#define " + TextureAttribute.NormalAlias + "Flag\n";
 			prefix += "#define " + TextureAttribute.NormalAlias + "Coord texCoord0\n"; // FIXME implement UV mapping
+		}
+		if ((mask & TextureAttribute.Emissive) == TextureAttribute.Emissive) {
+			prefix += "#define " + TextureAttribute.EmissiveAlias + "Flag\n";
+			prefix += "#define " + TextureAttribute.EmissiveAlias + "Coord texCoord0\n"; // FIXME implement UV mapping
+		}
+		if ((mask & TextureAttribute.Reflection) == TextureAttribute.Reflection) {
+			prefix += "#define " + TextureAttribute.ReflectionAlias + "Flag\n";
+			prefix += "#define " + TextureAttribute.ReflectionAlias + "Coord texCoord0\n"; // FIXME implement UV mapping
+		}
+		if ((mask & TextureAttribute.Ambient) == TextureAttribute.Ambient) {
+			prefix += "#define " + TextureAttribute.AmbientAlias + "Flag\n";
+			prefix += "#define " + TextureAttribute.AmbientAlias + "Coord texCoord0\n"; // FIXME implement UV mapping
 		}
 		if ((mask & ColorAttribute.Diffuse) == ColorAttribute.Diffuse)
 			prefix += "#define " + ColorAttribute.DiffuseAlias + "Flag\n";
@@ -785,6 +783,8 @@ public class DefaultShader extends BaseShader {
 				program.setUniformf(idx + pointLightsColorOffset, pointLights[i].color.r * pointLights[i].intensity,
 					pointLights[i].color.g * pointLights[i].intensity, pointLights[i].color.b * pointLights[i].intensity);
 				program.setUniformf(idx + pointLightsPositionOffset, pointLights[i].position);
+				if (pointLightsIntensityOffset >= 0)
+					program.setUniformf(idx + pointLightsIntensityOffset, pointLights[i].intensity);
 				if (pointLightsSize <= 0) break;
 			}
 		}

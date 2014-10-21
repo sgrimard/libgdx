@@ -91,7 +91,6 @@ import com.badlogic.gdx.tests.SpriteBatchShaderTest;
 import com.badlogic.gdx.tests.SpriteCacheOffsetTest;
 import com.badlogic.gdx.tests.SpriteCacheTest;
 import com.badlogic.gdx.tests.StageTest;
-import com.badlogic.gdx.tests.StateMachineTest;
 import com.badlogic.gdx.tests.TableTest;
 import com.badlogic.gdx.tests.TextButtonTest;
 import com.badlogic.gdx.tests.TextureAtlasTest;
@@ -360,6 +359,11 @@ public class GwtTestWrapper extends GdxTest {
 		@Override
 		public void setCatchBackKey (boolean catchBack) {
 			input.setCatchBackKey(catchBack);
+		}
+
+		@Override
+		public boolean isCatchBackKey() {
+			return input.isCatchBackKey();
 		}
 
 		@Override
@@ -693,10 +697,6 @@ public class GwtTestWrapper extends GdxTest {
 		}, new Instancer() {
 			public GdxTest instance () {
 				return new TimeUtilsTest();
-			}
-		}, new Instancer() {
-			public GdxTest instance () {
-				return new StateMachineTest();
 			}
 		}};
 }
